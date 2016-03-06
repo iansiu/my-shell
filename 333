@@ -97,6 +97,7 @@ class TCPRelayHandler(object):
         self._data_to_write_to_remote = []
         self._upstream_status = WAIT_STATUS_READING
         self._downstream_status = WAIT_STATUS_INIT
+        self._client_address = local_sock.getpeername()[:2]
         self._remote_address = None
         if is_local:
             self._chosen_server = self._get_a_server()
@@ -259,7 +260,8 @@ class TCPRelayHandler(object):
             if header_result is None:
                 raise Exception('[%s]can not parse header' % (self._config['server_port']))
             addrtype, remote_addr, remote_port, header_length = header_result
-            logging.info('connecting %s:%d' % (remote_addr, remote_port))
+            logging.info('connecting %s:%d' % (remote_addr, remote_port,
+                          self._client_address[0], self._client_address[1]))
             self._remote_address = (remote_addr, remote_port)
             # pause reading
             self._update_stream(STREAM_UP, WAIT_STATUS_WRITING)
@@ -461,6 +463,10 @@ class TCPRelayHandler(object):
                 self._on_local_write()
         else:
             logging.warn('unknown socket')
+    
+    def _log_error(self, e):
+        logging.error('%s when handling connection from %s:%d' %
+                      (e, self._client_address[0], self._client_address[1]))
 
     def destroy(self):
         if self._stage == STAGE_DESTROYED:
