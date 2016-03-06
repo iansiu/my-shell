@@ -157,9 +157,8 @@ command=python /root/shadowsocks/shadowsocks/server.py -c /root/shadowsocks/shad
 autostart=true
 autorestart=true
 startsecs=3
-log_stdout=true
-log_stderr=true
-logfile=/var/log/shadowsocks.log
+redirect_stderr=true
+stdout_logfile=/var/log/shadowsocks.log
 
 [supervisord]' >/etc/supervisord.conf
 
