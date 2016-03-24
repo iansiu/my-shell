@@ -19,9 +19,10 @@ begin_time() {
 
 ######    定义        #####      #### 安装很多依赖主要是考虑到minimal系统。
 
-yumrely=(yum install epel-release python-devel python-setuptools m2crypto supervisor libevent gcc gcc-c++)
+yumrely=(epel-release python-devel python-setuptools m2crypto libevent gcc gcc-c++)
 piprely=(greenlet gevent gevent supervisor cymysql)
 syst_version=`cat /etc/redhat-release |cut -d ' ' -f 1`
+system=CentOS
 
 function print_good () {
 	echo -e "\x1B[01;32m[+]\x1B[0m $1"
@@ -79,7 +80,7 @@ else
     #ln -s /bin/true /sbin/sysctl
 	#默认关闭，OpenVZ VPS用得上。
 
-	echo 'net.ipv4.tcp_syncookies = 1
+    echo 'net.ipv4.tcp_syncookies = 1
     net.ipv4.tcp_tw_reuse = 1
     net.ipv4.tcp_tw_recycle = 1
     net.ipv4.tcp_fin_timeout = 30
@@ -90,13 +91,13 @@ else
     net.core.rmem_max = 67108864
     net.core.wmem_max = 67108864
     net.ipv4.tcp_rmem = 4096 87380 67108864
-	net.ipv4.tcp_wmem = 4096 65536 67108864
+    net.ipv4.tcp_wmem = 4096 65536 67108864
     net.core.netdev_max_backlog = 250000
     net.ipv4.tcp_mtu_probing=1 ' >/etc/sysctl.conf
     #net.ipv4.tcp_congestion_control=hybla' >/etc/sysctl.conf ## 内核支持才可以
 
-	sed -i 's/^    //g' /etc/sysctl.conf
-	sysctl -p
+    sed -i 's/^    //g' /etc/sysctl.conf
+    sysctl -p
 
 ##### 添加iptables规则 ##### 
 
@@ -120,6 +121,13 @@ else
 	service iptables save
 	service iptables restart
 
+##### 安装libsodium开启chacah20加密  #####
+
+	https://download.libsodium.org/libsodium/releases/libsodium-1.0.8.tar.gz
+	tar xf libsodium-1.0.8.tar.gz && cd libsodium-1.0.8
+	./configure && make && make install
+	echo /usr/local/lib > /etc/ld.so.conf.d/usr_local_lib.conf
+    ldconfig
 
 ##### 设置supervisor监控shadowsocks #####
 
@@ -152,8 +160,7 @@ else
 	wget http://longshanren.net/soft/supervisord -O /etc/init.d/supervisord && chmod 755 /etc/init.d/supervisord || exit 1
 	chkconfig --add supervisord
 	chkconfig supervisord on
-	ln -sf /etc/init.d/supervisord /usr/bin/sss
-	sss start
+	echo "改下shadowsocks/Config.py里面的数据库信息就可以启动了"
 	rm -rf DenyHosts-2.6  DenyHosts-2.6.tar.gz  auto_install_denyhosts.sh distribute-0.7.3.zip distribute-0.7.3 ~/iptables.sh
 fi    
 }
