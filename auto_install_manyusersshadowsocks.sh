@@ -171,10 +171,10 @@ function end_time() {
     print_good ""  
     print_good "                从 $begin_year_month_day $begin_hours:$begin_minute:$begin_second 开始，于 $end_year_month_day $end_hours:$end_minute:$end_second 完成."
     print_good ""
-    print_good "            一共耗费了 $[$end_hours-begin_hours] 小时 $[$end_minute-begin_minute] 分钟 $[$end_second-$begin_second] 秒"|sed 's/\-//'
+    print_good "                一共耗费了 $[$end_hours-begin_hours] 小时 $[$end_minute-begin_minute] 分钟 $[$end_second-$begin_second] 秒"|sed 's/\-//'
     print_good ""
     print_good "*******************************************************************************************************"
     echo ""
 }
     
-	begin_time;install_configure;end_time;rm -rf $0
+	begin_time&&install_configure&&end_time&&rm -rf $0
